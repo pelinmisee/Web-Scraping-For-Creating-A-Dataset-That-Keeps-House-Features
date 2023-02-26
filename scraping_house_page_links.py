@@ -18,8 +18,9 @@ class House_Scraper:
 
 
     def discography(self):
-        page_number=801
-        while page_number <= 900:
+        #from page 1 to 800 were scraped 
+        page_number=1
+        while page_number <= 800:
             page=requests.get(self.url + "?pn={}".format(page_number), headers={'User-Agent': USER_AGENT})
             soup = BeautifulSoup(page.content, 'html.parser')
             parse1=soup.find('div', class_='list-content-properties')
