@@ -25,7 +25,8 @@ class House_Scraper:
             parse1=soup.find('div', class_='list-content-properties')
             parse2=parse1.find_all('div', class_='property-info-content')
             for i in parse2:
-                self.house_links.append(i.find('a').get('href'))
+                if i.find('a').get('href') not in self.house_links and i.find('a').get('href').startswith('https:'):
+                    self.house_links.append(i.find('a').get('href'))
             
             print("Page {} done".format(page_number))            
             page_number+=1
