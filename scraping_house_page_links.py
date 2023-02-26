@@ -35,16 +35,26 @@ class House_Scraper:
 
     
     def get_house_links(self):
-        with open ('urls.json', "r") as f:
+        with open ('home_urls.json', "r") as f:
             data = json.load(f)
-            total=len(data)
-            print("Total number of houses: {}".format(total))
+            return data
+
+    def take_features_of_house(self,link_list):
+        for i in link_list:
+            page=requests.get(i['house_link'], headers={'User-Agent': USER_AGENT})
+            soup = BeautifulSoup(page.content, 'html.parser')
+            print(soup)
+
+            #TODO: take features of EACH house and write them to a csv file then to a database
+
+            
 
 
 
 if __name__ == '__main__':
     scraper = House_Scraper('https://casa.sapo.pt/comprar-apartamentos/')
     #scraper.discography()
-    scraper.get_house_links()
+    house_links=scraper.get_house_links()
+    scraper.take_features_of_house(house_links)
 
 
