@@ -18,8 +18,8 @@ class House_Scraper:
 
 
     def discography(self):
-        page_number=1
-        while page_number <= 200:
+        page_number=801
+        while page_number <= 900:
             page=requests.get(self.url + "?pn={}".format(page_number), headers={'User-Agent': USER_AGENT})
             soup = BeautifulSoup(page.content, 'html.parser')
             parse1=soup.find('div', class_='list-content-properties')
@@ -31,6 +31,18 @@ class House_Scraper:
             page_number+=1
         self.write_house_links_to_json()
 
+    
+    def get_house_links(self):
+        with open ('urls.json', "r") as f:
+            data = json.load(f)
+            total=len(data)
+            print("Total number of houses: {}".format(total))
+
+
+
 if __name__ == '__main__':
     scraper = House_Scraper('https://casa.sapo.pt/comprar-apartamentos/')
-    scraper.discography()
+    #scraper.discography()
+    scraper.get_house_links()
+
+
