@@ -28,7 +28,8 @@ class House_Scraper:
             for i in parse2:
                 if i.find('a').get('href') not in self.house_links and i.find('a').get('href').startswith('https:'):
                     self.house_links.append(i.find('a').get('href'))
-            
+                if i.find('a').get('href') not in self.house_links and i.find('a').get('href').startswith('/'):
+                    self.house_links.append('https://casa.sapo.pt' + i.find('a').get('href'))
             print("Page {} done".format(page_number))            
             page_number+=1
         self.write_house_links_to_json()
