@@ -2,6 +2,13 @@ from bs4        import BeautifulSoup
 import requests
 import json
 
+"""
+That script is for scraping house links from a website.
+But that one doesn't used because of catching some features for model training.
+That is why I wrote another script for scraping house links that links will provide another script for scraping needed features of houses.
+
+"""
+
 
 #user agent is specified for preventing some reachment problems to the website.
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36'
