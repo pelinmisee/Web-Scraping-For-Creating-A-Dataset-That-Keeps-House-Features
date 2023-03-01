@@ -12,7 +12,7 @@ class House_Scraper:
 
     def write_house_links_to_json(self):
         data=[{"house_link": link} for link in self.house_links]
-        with open('homepage_links.json','w',encoding='utf-8') as f:
+        with open('deneme.json','w',encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=True, indent=4 )      
 
 
@@ -20,7 +20,7 @@ class House_Scraper:
 
         #from page 1 to page 1000, all the house links are collected and stored in total 23414 links.
         page_number=1
-        while page_number <= 1000:
+        while page_number <= 1:
             page=requests.get(self.url + "?page={}".format(page_number), headers={'User-Agent': USER_AGENT})
             soup = BeautifulSoup(page.content, 'html.parser')
             parse1=soup.find("div", class_="listView")
@@ -29,7 +29,6 @@ class House_Scraper:
             for i in parse3:
                 if i.find("a", class_="card-link")['href'] not in self.house_links:
                     self.house_links.append("https://www.hepsiemlak.com/"+i.find("a", class_="card-link")['href'])
-
             print("Page {} done".format(page_number))            
             page_number+=1
         
@@ -39,9 +38,40 @@ class House_Scraper:
     def get_house_links(self):
         with open ('all.json', 'r', encoding='utf-8') as f:
             data=json.load(f)
-            print(len(data))
+            return data
 
-    
+    def get_house_details(self):
+        self.house_links=self.get_house_links()
+        for i in self.house_links:
+            i=i['house_link']
+            page=requests.get(i, headers={'User-Agent': USER_AGENT})
+            soup = BeautifulSoup(page.content, 'html.parser')
+            price=int(soup.find("p", class_="fontRB fz24 price").text.replace("TL","").replace(" ","").replace("\n","").replace(".",""))
+            all_details=soup.find("div", class_="spec-groups")
+            all_details_table=all_details.find_all("ul", class_="adv-info-list")
+            il_ilce_mah=soup.find("ul", class_="short-info-list")
+            il_ilce_mah=il_ilce_mah.find_all("li")
+            il=il_ilce_mah[0].text.replace("\n","").replace(" ","")
+            ilce=il_ilce_mah[1].text.replace("\n","").replace(" ","")
+            mahalle=il_ilce_mah[2].text.replace("\n","").replace(" ","")
+            print(il, ilce, mahalle, price)
+            #for left side details
+            left_details=all_details_table[0].find_all("li", class_="spec-item")
+            if len(left_details) < 9:
+                continue
+            ilan_no=left_details[0].text.replace("İlan no ","")
+            room=left_details[4].text.replace("Oda + Salon Sayısı ","").replace("+ ","").split(" ")[0]
+            salon=left_details[4].text.replace("Oda + Salon Sayısı ","").replace("+ ","").split(" ")[1]
+            brut_m2=int(left_details[5].text.replace(" ", "").replace("\n","").replace("Brüt/NetM2","").split("/")[0].replace("m2", ""))
+            net_m2=int(left_details[5].text.replace(" ", "").replace("\n","").replace("Brüt/NetM2","").split("/")[1].replace("m2", ""))
+            floor_location=left_details[6].text.replace("Bulunduğu Kat ","").replace("Kat", "").replace(".","")
+            building_age=int(left_details[7].text.replace("Bina Yaşı ","").replace("Yaşında", "").replace("Bina","").replace("Sıfır ","0"))
+            warm_up_type=left_details[8].text.replace("Isınma Tipi ","")
+            print(ilan_no, room, salon, brut_m2, net_m2, floor_location, building_age, warm_up_type)
+
+            #for right side details
+
 scraper = House_Scraper('https://www.hepsiemlak.com/en/satilik/daire')
-#scraper.discography()
-scraper.get_house_links()
+scraper.discography()
+#scraper.get_house_links()
+scraper.get_house_details()
