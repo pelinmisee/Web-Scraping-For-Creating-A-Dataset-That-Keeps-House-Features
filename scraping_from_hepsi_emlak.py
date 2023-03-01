@@ -55,6 +55,30 @@ class House_Scraper:
             ilce=il_ilce_mah[1].text.replace("\n","").replace(" ","")
             mahalle=il_ilce_mah[2].text.replace("\n","").replace(" ","")
 
+            
+            
+            """new version:
+                def get_house_details(self):
+        self.house_links=self.get_house_links()
+        for i in self.house_links:
+            i=i['house_link']
+            page=requests.get(i, headers={'User-Agent': USER_AGENT})
+            soup = BeautifulSoup(page.content, 'html.parser')
+            il_ilce_mah=soup.find("ul", class_="short-info-list")
+            il_ilce_mah=il_ilce_mah.find_all("li")
+            il=il_ilce_mah[0].text.replace("\n","").replace(" ","")
+            ilce=il_ilce_mah[1].text.replace("\n","").replace(" ","")
+            mahalle=il_ilce_mah[2].text.replace("\n","").replace(" ","")
+            price=(soup.find("p", class_="fontRB fz24 price"))
+            if price is not None:  #it is not sold
+                price=int(soup.find("p", class_="fontRB fz24 price").text.replace("TL","").replace(" ","").replace("\n","").replace(".",""))
+            else: #it is sold
+                price=0
+            print(il, ilce, mahalle, price)
+            #all_details=soup.find("div", class_="spec-groups")
+           # all_details_table=all_details.find_all("ul", class_="adv-info-list")
+           
+           """
             #TODO: LENGTH OF THE LIST IS NOT ALWAYS 10. IT SHOULD BE CHECKED. THAT CAUSES SOME PROBLEMS IN THE HOUSE DETAILS.
 
             #for left side details
