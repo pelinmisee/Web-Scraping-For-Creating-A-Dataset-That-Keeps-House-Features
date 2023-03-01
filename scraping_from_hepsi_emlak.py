@@ -54,10 +54,12 @@ class House_Scraper:
             il=il_ilce_mah[0].text.replace("\n","").replace(" ","")
             ilce=il_ilce_mah[1].text.replace("\n","").replace(" ","")
             mahalle=il_ilce_mah[2].text.replace("\n","").replace(" ","")
-            print(il, ilce, mahalle, price)
+
+            #TODO: LENGTH OF THE LIST IS NOT ALWAYS 10. IT SHOULD BE CHECKED. THAT CAUSES SOME PROBLEMS IN THE HOUSE DETAILS.
+
             #for left side details
             left_details=all_details_table[0].find_all("li", class_="spec-item")
-            if len(left_details) < 9:
+            if len(left_details) < 10:
                 continue
             ilan_no=left_details[0].text.replace("İlan no ","")
             room=left_details[4].text.replace("Oda + Salon Sayısı ","").replace("+ ","").split(" ")[0]
@@ -66,11 +68,13 @@ class House_Scraper:
             net_m2=int(left_details[5].text.replace(" ", "").replace("\n","").replace("Brüt/NetM2","").split("/")[1].replace("m2", ""))
             floor_location=left_details[6].text.replace("Bulunduğu Kat ","").replace("Kat", "").replace(".","")
             building_age=int(left_details[7].text.replace("Bina Yaşı ","").replace("Yaşında", "").replace("Bina","").replace("Sıfır ","0"))
-            warm_up_type=left_details[8].text.replace("Isınma Tipi ","")
-            print(ilan_no, room, salon, brut_m2, net_m2, floor_location, building_age, warm_up_type)
+            
+            print(ilan_no, room, salon, brut_m2, net_m2, floor_location, building_age)
 
             #for right side details
-
+            right_details=all_details_table[1].find_all("li", class_="spec-item")
+            bathroom_amount=right_details[1].text.replace("Banyo Sayısı ","")
+            print(bathroom_amount)
 scraper = House_Scraper('https://www.hepsiemlak.com/en/satilik/daire')
 scraper.discography()
 #scraper.get_house_links()
