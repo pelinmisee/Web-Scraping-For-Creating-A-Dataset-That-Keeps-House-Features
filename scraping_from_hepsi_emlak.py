@@ -41,7 +41,7 @@ class House_Scraper:
             return data
 
     def get_house_details(self):
-                self.house_links=self.get_house_links()
+        self.house_links=self.get_house_links()
         for i in self.house_links:
             i=i['house_link']
             page=requests.get(i, headers={'User-Agent': USER_AGENT})
