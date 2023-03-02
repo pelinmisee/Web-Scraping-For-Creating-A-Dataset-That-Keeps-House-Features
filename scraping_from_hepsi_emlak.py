@@ -41,64 +41,82 @@ class House_Scraper:
             return data
 
     def get_house_details(self):
-        self.house_links=self.get_house_links()
+                self.house_links=self.get_house_links()
         for i in self.house_links:
             i=i['house_link']
             page=requests.get(i, headers={'User-Agent': USER_AGENT})
             soup = BeautifulSoup(page.content, 'html.parser')
-            price=int(soup.find("p", class_="fontRB fz24 price").text.replace("TL","").replace(" ","").replace("\n","").replace(".",""))
-            all_details=soup.find("div", class_="spec-groups")
-            all_details_table=all_details.find_all("ul", class_="adv-info-list")
-            il_ilce_mah=soup.find("ul", class_="short-info-list")
-            il_ilce_mah=il_ilce_mah.find_all("li")
-            il=il_ilce_mah[0].text.replace("\n","").replace(" ","")
-            ilce=il_ilce_mah[1].text.replace("\n","").replace(" ","")
-            mahalle=il_ilce_mah[2].text.replace("\n","").replace(" ","")
-
-            
-            
-            """new version:
-                def get_house_details(self):
-        self.house_links=self.get_house_links()
-        for i in self.house_links:
-            i=i['house_link']
-            page=requests.get(i, headers={'User-Agent': USER_AGENT})
-            soup = BeautifulSoup(page.content, 'html.parser')
-            il_ilce_mah=soup.find("ul", class_="short-info-list")
-            il_ilce_mah=il_ilce_mah.find_all("li")
-            il=il_ilce_mah[0].text.replace("\n","").replace(" ","")
-            ilce=il_ilce_mah[1].text.replace("\n","").replace(" ","")
-            mahalle=il_ilce_mah[2].text.replace("\n","").replace(" ","")
             price=(soup.find("p", class_="fontRB fz24 price"))
+            home_link=i
             if price is not None:  #it is not sold
-                price=int(soup.find("p", class_="fontRB fz24 price").text.replace("TL","").replace(" ","").replace("\n","").replace(".",""))
-            else: #it is sold
-                price=0
-            print(il, ilce, mahalle, price)
-            #all_details=soup.find("div", class_="spec-groups")
-           # all_details_table=all_details.find_all("ul", class_="adv-info-list")
-           
-           """
-            #TODO: LENGTH OF THE LIST IS NOT ALWAYS 10. IT SHOULD BE CHECKED. THAT CAUSES SOME PROBLEMS IN THE HOUSE DETAILS.
+                print(i)
+                #bottom details part
+                il_ilce_mah=soup.find("ul", class_="short-info-list")
+                il_ilce_mah=il_ilce_mah.find_all("li")
+                il=il_ilce_mah[0].text.replace("\n","").replace(" ","")
+                ilce=il_ilce_mah[1].text.replace("\n","").replace(" ","")
+                mahalle=il_ilce_mah[2].text.replace("\n","").replace(" ","")
 
-            #for left side details
-            left_details=all_details_table[0].find_all("li", class_="spec-item")
-            if len(left_details) < 10:
-                continue
-            ilan_no=left_details[0].text.replace("İlan no ","")
-            room=left_details[4].text.replace("Oda + Salon Sayısı ","").replace("+ ","").split(" ")[0]
-            salon=left_details[4].text.replace("Oda + Salon Sayısı ","").replace("+ ","").split(" ")[1]
-            brut_m2=int(left_details[5].text.replace(" ", "").replace("\n","").replace("Brüt/NetM2","").split("/")[0].replace("m2", ""))
-            net_m2=int(left_details[5].text.replace(" ", "").replace("\n","").replace("Brüt/NetM2","").split("/")[1].replace("m2", ""))
-            floor_location=left_details[6].text.replace("Bulunduğu Kat ","").replace("Kat", "").replace(".","")
-            building_age=int(left_details[7].text.replace("Bina Yaşı ","").replace("Yaşında", "").replace("Bina","").replace("Sıfır ","0"))
-            
-            print(ilan_no, room, salon, brut_m2, net_m2, floor_location, building_age)
+                price=int(soup.find("p", class_="fontRB fz24 price").text.replace("TL","").replace(" ","").replace("\n","").replace(".","").replace("GBP",""))
+                all_details=soup.find("div", class_="spec-groups")
+                all_details_table=all_details.find_all("ul", class_="adv-info-list")
+                
+                #left details part
+                left_details=all_details_table[0].find_all("li", class_="spec-item")
+                for i in range(len(left_details)):
+                    if left_details[i].text.startswith("İlan no"):
+                        ilan_no=left_details[i].text.replace("İlan no ","")
+                    elif left_details[i].text.startswith("Oda + Salon Sayısı"):
+                        room_and_salon=left_details[i].text.replace("Oda + Salon Sayısı ","")
+                        room=int(room_and_salon.split("+")[0])
+                        salon=int(room_and_salon.split(" + ")[1])
+                    elif left_details[i].text.startswith("Brüt / Net M2"):
+                        m2=left_details[i].text.replace("Brüt / Net M2 ","").replace(" ","").replace("\n","")
+                        brut_m2=int(m2.split("/")[0].replace("m2","").replace(".",""))
+                        net_m2=int(m2.split("/")[1].replace("m2","").replace(".",""))
+                    elif left_details[i].text.startswith("Bulunduğu Kat"):
+                        floor_location=left_details[i].text.replace("Bulunduğu Kat ","")
+                    elif left_details[i].text.startswith("Bina Yaşı"):
+                        building_age=left_details[i].text.replace("Bina Yaşı ","").replace("Yaşında","").replace("\n","")
+                        if building_age.startswith("Sıfır"):
+                            building_age=0
+                        else:
+                            building_age=int(building_age)
+                    elif left_details[i].text.startswith("Kat Sayısı"):
+                        building_floor=int(left_details[i].text.replace("Kat Sayısı ","").replace("Katlı",""))
+                    
+                    elif left_details[i].text.startswith("Kredi"):
+                        compliance_with_loan=left_details[i].text.replace("Krediye Uygunluk ","")
+                        if compliance_with_loan.startswith("Uygun"):
+                            compliance_with_loan=True
 
-            #for right side details
-            right_details=all_details_table[1].find_all("li", class_="spec-item")
-            bathroom_amount=right_details[1].text.replace("Banyo Sayısı ","")
-            print(bathroom_amount)
+                    else:
+                        continue
+
+                #right details part
+                right_details=all_details_table[1].find_all("li", class_="spec-item")
+                for i in range(len(right_details)):
+                    if right_details[i].text.startswith("Kat Sayısı"):
+                        building_floor=int(right_details[i].text.replace("Kat Sayısı ","").replace("Katlı",""))
+                        print(building_floor)
+                    elif right_details[i].text.startswith("Kredi"):
+                        compliance_with_loan=right_details[i].text.replace("Krediye Uygunluk ","")
+                        if compliance_with_loan.startswith("Uygun"):
+                            compliance_with_loan=True
+                    elif right_details[i].text.startswith("Banyo"):
+                        bathroom_amount=int(right_details[i].text.replace("Banyo Sayısı ",""))
+                    elif right_details[i].text.startswith("Yapı Tipi"):
+                        building_type=right_details[i].text.replace("Yapı Tipi ","")
+                    elif right_details[i].text.startswith("Yakıt Tipi"):
+                        fuel_type=right_details[i].text.replace("Yakıt Tipi ","")
+                    
+                
+            else:
+                pass
+            """
+            later that might be used for percantage of sold houses according to location
+            it is sold and there is no price information thus don't need to collect other details
+            """
 scraper = House_Scraper('https://www.hepsiemlak.com/en/satilik/daire')
 scraper.discography()
 #scraper.get_house_links()
