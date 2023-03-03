@@ -1,6 +1,7 @@
 from bs4        import BeautifulSoup
 import requests
 import json
+import csv
 
 #user agent is specified for preventing some reachment problems to the website.
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36'
@@ -15,6 +16,20 @@ class House_Scraper:
         with open('deneme.json','w',encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=True, indent=4 )      
 
+
+    def add_header(self):
+        with open('house_info.csv', 'w', encoding='utf-8') as f:
+            #add header
+            writer = csv.writer(f)
+            writer.writerow(["ilan_no","room","salon","brut_m2","net_m2","floor_location","building_age","building_floor","compliance_with_loan","bathroom_amount","building_type","fuel_type","price","il","ilce","mahalle","home_link"])
+
+
+    def write_house_info_to_csv(self,ilan_no,room,salon,brut_m2,net_m2,floor_location,building_age,building_floor,compliance_with_loan,bathroom_amount,building_type,fuel_type,price,home_link,il,ilce,mahalle):
+       
+        
+        with open('house_info.csv', 'a', encoding='utf-8') as f:
+            writer = csv.writer(f)
+            writer.writerow([ilan_no,room,salon,brut_m2,net_m2,floor_location,building_age,building_floor,compliance_with_loan,bathroom_amount,building_type,fuel_type,price,home_link,il,ilce,mahalle])
 
     def discography(self):
 
@@ -36,12 +51,25 @@ class House_Scraper:
 
     
     def get_house_links(self):
-        with open ('all.json', 'r', encoding='utf-8') as f:
+        with open ('deneme.json', 'r', encoding='utf-8') as f:
             data=json.load(f)
             return data
 
     def get_house_details(self):
         self.house_links=self.get_house_links()
+        self.add_header()
+        ilan_no=0
+        room=0
+        salon=0
+        brut_m2=0
+        net_m2=0
+        floor_location=0
+        building_age=0
+        building_floor=0
+        compliance_with_loan=False
+        bathroom_amount=0
+        building_type=""
+        fuel_type=""
         for i in self.house_links:
             i=i['house_link']
             page=requests.get(i, headers={'User-Agent': USER_AGENT})
@@ -75,7 +103,7 @@ class House_Scraper:
                         brut_m2=int(m2.split("/")[0].replace("m2","").replace(".",""))
                         net_m2=int(m2.split("/")[1].replace("m2","").replace(".",""))
                     elif left_details[i].text.startswith("Bulunduğu Kat"):
-                        floor_location=left_details[i].text.replace("Bulunduğu Kat ","")
+                        floor_location=left_details[i].text.replace("Bulunduğu Kat ","").replace(". Kat", "")
                     elif left_details[i].text.startswith("Bina Yaşı"):
                         building_age=left_details[i].text.replace("Bina Yaşı ","").replace("Yaşında","").replace("\n","")
                         if building_age.startswith("Sıfır"):
@@ -110,14 +138,13 @@ class House_Scraper:
                     elif right_details[i].text.startswith("Yakıt Tipi"):
                         fuel_type=right_details[i].text.replace("Yakıt Tipi ","")
                     
-                
-            else:
-                pass
+            self.write_house_info_to_csv(ilan_no,room,salon,brut_m2,net_m2,floor_location,building_age,building_floor,compliance_with_loan,bathroom_amount,building_type,fuel_type,price,il,ilce,mahalle,home_link)
+            
             """
             later that might be used for percantage of sold houses according to location
             it is sold and there is no price information thus don't need to collect other details
             """
 scraper = House_Scraper('https://www.hepsiemlak.com/en/satilik/daire')
-scraper.discography()
+#scraper.discography()
 #scraper.get_house_links()
 scraper.get_house_details()
