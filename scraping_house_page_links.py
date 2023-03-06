@@ -3,9 +3,11 @@ import requests
 import json
 
 """
-That script is for scraping house links from a website.
+@Script: That script is for scraping house links from a website.
 But that one doesn't used because of catching some features for model training.
 That is why I wrote another script for scraping house links that links will provide another script for scraping needed features of houses.
+
+@Author: Pelin Mise
 
 """
 
