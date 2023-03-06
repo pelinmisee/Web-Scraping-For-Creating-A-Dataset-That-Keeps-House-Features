@@ -3,6 +3,15 @@ import requests
 import json
 import csv
 
+"""
+@Script: Provides scraping house data and keep them into a csv file for data modeling processes.
+
+@Author: Pelin Mise
+
+"""
+
+
+
 #user agent is specified for preventing some reachment problems to the website.
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36'
 
@@ -51,7 +60,7 @@ class House_Scraper:
 
     
     def get_house_links(self):
-        with open ('deneme.json', 'r', encoding='utf-8') as f:
+        with open ('all.json', 'r', encoding='utf-8') as f:
             data=json.load(f)
             return data
 
